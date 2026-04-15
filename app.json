@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Timeless RN",
+    "slug": "timelessrn",
+    "version": "1.0.0",
+    "scheme": "timelessrn",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ohmacademy.timelessrn",
+      "icon": "./assets/images/icon.png"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#000000"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.ohmacademy.timelessrn"
+    },
+    "web": {
+      "favicon": "./assets/images/icon.png",
+      "bundler": "metro",
+      "name": "Timeless RN",
+      "shortName": "Timeless RN",
+      "description": "Timeless RN Wellness Spa",
+      "themeColor": "#0A0806",
+      "backgroundColor": "#0A0806",
+      "icon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
