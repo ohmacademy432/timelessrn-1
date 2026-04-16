@@ -1,18 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Linking } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Linking, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { colors, fonts } from "@/lib/theme";
 
 type Props = { isOpen: boolean; onClose: () => void };
 type ModalKey = null|"about"|"team"|"location"|"contact"|"history"|"privacy"|"terms";
+type Appointment = { id: string; service: string; appointment_date: string; notes: string };
+
+const ADMIN_EMAIL = "timelessrnwellnessspa@gmail.com";
 
 const MODALS: Record<string,{title:string;body:string}> = {
   about:{title:"ABOUT TIMELESS RN",body:"Timeless RN Wellness Spa was established in 2017 and is located in West Nashville, The Nations. We specialize in evidence-based, nurse-administered IV therapies and wellness solutions. All treatments are administered by Registered Nurses under the guidance of Medical Director Dr. Lawrence Jackson Jr.\n\nOur mission is to provide safe, effective, and convenient therapies that support your energy, immunity, recovery, and longevity."},
   team:{title:"OUR TEAM",body:"Our team is led by Registered Nurses with clinical experience in hydration, aesthetics, and regenerative therapies.\n\nMedical Director: Dr. Lawrence Jackson Jr. \u2014 provides oversight for all protocols and treatments.\n\nEvery session at Timeless RN is personally administered by a licensed RN, ensuring the highest level of safety and care."},
   location:{title:"LOCATION & HOURS",body:"4909 Alabama Ave\nNashville, TN 37029\nWest Nashville \u2014 The Nations\n\nTuesday - Saturday: 11am - 7pm\nSunday: By Request\nMonday: Closed\n\n615-970-2015\ntimelessrnwellnessspa@gmail.com"},
   contact:{title:"CONTACT US",body:"We\u2019d love to hear from you.\n\nPhone: 615-970-2015\nEmail: timelessrnwellnessspa@gmail.com\n\n4909 Alabama Ave\nNashville, TN 37029\nWest Nashville \u2014 The Nations"},
-  history:{title:"APPOINTMENT HISTORY",body:"Your appointment history will appear here once you\u2019ve completed your first visit.\n\nBook your first session to begin your wellness journey with Timeless RN."},
+  history:{title:"APPOINTMENT HISTORY",body:""},
   privacy:{title:"PRIVACY POLICY",body:"Timeless RN takes your privacy seriously. Your personal and health information is stored securely and never sold or shared with third parties.\n\nAll treatment records are maintained in accordance with HIPAA standards.\n\nFor questions about your data please contact us at timelessrnwellnessspa@gmail.com."},
   terms:{title:"TERMS OF USE",body:"By using the Timeless RN app you agree to use this service for your personal wellness. All treatments are subject to nurse screening and medical director approval.\n\nTimeless RN is not a substitute for emergency medical care. If you are experiencing a medical emergency please call 911.\n\nYour continued use of the app constitutes acceptance of these terms."},
 };
@@ -25,9 +28,14 @@ export default function DrawerMenu({ isOpen, onClose }: Props) {
   const fade = useRef(new Animated.Value(0)).current;
   const [rendered, setRendered] = useState(isOpen);
   const [activeModal, setActiveModal] = useState<ModalKey>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (isOpen) { setRendered(true); Animated.parallel([Animated.timing(slide,{toValue:0,duration:280,useNativeDriver:false}),Animated.timing(fade,{toValue:1,duration:280,useNativeDriver:false})]).start(); }
+    if (isOpen) {
+      setRendered(true);
+      Animated.parallel([Animated.timing(slide,{toValue:0,duration:280,useNativeDriver:false}),Animated.timing(fade,{toValue:1,duration:280,useNativeDriver:false})]).start();
+      supabase.auth.getUser().then(({data:{user}})=>{setIsAdmin(user?.email===ADMIN_EMAIL);});
+    }
     else { Animated.parallel([Animated.timing(slide,{toValue:drawerWidth,duration:220,useNativeDriver:false}),Animated.timing(fade,{toValue:0,duration:220,useNativeDriver:false})]).start(({finished})=>{if(finished)setRendered(false);}); }
   }, [isOpen, drawerWidth]);
 
@@ -49,6 +57,8 @@ export default function DrawerMenu({ isOpen, onClose }: Props) {
           <Text style={s.secLbl}>ACCOUNT</Text>
           <MI l="My Profile" o={()=>go("/profile")}/><MI l="Notifications" o={()=>go("/profile")}/><MI l="Appointment History" o={()=>modal("history")}/>
 
+          {isAdmin && <><Text style={s.secLbl}>ADMIN</Text><MI l="Manage Appointments" o={()=>go("/admin")}/></>}
+
           <Text style={s.secLbl}>INFO</Text>
           <MI l="About Timeless RN" o={()=>modal("about")}/><MI l="Our Team" o={()=>modal("team")}/><MI l="Location & Hours" o={()=>modal("location")}/><MI l="Contact Us" o={()=>modal("contact")}/>
 
@@ -59,11 +69,46 @@ export default function DrawerMenu({ isOpen, onClose }: Props) {
         </ScrollView>
       </Animated.View>
     </View>}
-    {(Object.keys(MODALS) as (keyof typeof MODALS)[]).map(k=><InfoModal key={k} visible={activeModal===k} title={MODALS[k].title} body={MODALS[k].body} onClose={()=>setActiveModal(null)} showMapBtn={k==="location"}/>)}
+    {(Object.keys(MODALS) as (keyof typeof MODALS)[]).filter(k=>k!=="history").map(k=><InfoModal key={k} visible={activeModal===k} title={MODALS[k].title} body={MODALS[k].body} onClose={()=>setActiveModal(null)} showMapBtn={k==="location"}/>)}
+    <HistoryModal visible={activeModal==="history"} onClose={()=>setActiveModal(null)}/>
   </>);
 }
 
 function MI({l,o}:{l:string;o:()=>void}){return<TouchableOpacity style={s.mi} onPress={o} activeOpacity={0.7}><Text style={s.miT}>{l}</Text></TouchableOpacity>;}
+
+function HistoryModal({visible,onClose}:{visible:boolean;onClose:()=>void}){
+  const[loading,setLoading]=useState(false);
+  const[appointments,setAppointments]=useState<Appointment[]>([]);
+
+  useEffect(()=>{
+    if(!visible)return;
+    setLoading(true);
+    (async()=>{
+      const{data:{user}}=await supabase.auth.getUser();
+      if(!user){setLoading(false);return;}
+      const{data}=await supabase.from("appointments").select("id, service, appointment_date, notes").eq("profile_id",user.id).order("appointment_date",{ascending:false});
+      setAppointments(data||[]);
+      setLoading(false);
+    })();
+  },[visible]);
+
+  if(!visible)return null;
+  return(<View style={m.root}><TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose}/>
+    <View style={m.card}><Text style={m.title}>APPOINTMENT HISTORY</Text><View style={m.div}/>
+      <ScrollView style={m.bs} showsVerticalScrollIndicator={false}>
+        {loading&&<ActivityIndicator color={colors.gold} style={{marginTop:16}}/>}
+        {!loading&&appointments.length===0&&<Text style={m.body}>No visits recorded yet.{"\n\n"}Your appointment history will appear here after your first visit with Timeless RN.</Text>}
+        {!loading&&appointments.map(a=>(
+          <View key={a.id} style={m.apptCard}>
+            <Text style={m.apptService}>{a.service}</Text>
+            <Text style={m.apptDate}>{a.appointment_date}</Text>
+            {a.notes?<Text style={m.apptNotes}>{a.notes}</Text>:null}
+          </View>
+        ))}
+      </ScrollView>
+      <TouchableOpacity onPress={onClose} style={m.closeBtn}><Text style={m.closeBtnT}>CLOSE</Text></TouchableOpacity>
+    </View></View>);
+}
 
 function InfoModal({visible,title,body,onClose,showMapBtn}:{visible:boolean;title:string;body:string;onClose:()=>void;showMapBtn?:boolean}){
   if(!visible)return null;
@@ -95,6 +140,10 @@ const m=StyleSheet.create({
   title:{fontFamily:fonts.sans,fontSize:18,color:colors.gold,letterSpacing:4,textAlign:"center",textTransform:"uppercase"},
   div:{height:1,backgroundColor:"rgba(184,137,90,0.2)",marginTop:14,marginBottom:16},
   bs:{maxHeight:360},body:{fontFamily:fonts.sansLight,fontSize:25,lineHeight:39,color:"rgba(245,239,228,0.8)"},
+  apptCard:{backgroundColor:"rgba(184,137,90,0.08)",borderWidth:1,borderColor:"rgba(184,137,90,0.12)",borderRadius:8,padding:14,marginBottom:10},
+  apptService:{fontFamily:fonts.sansMedium,fontSize:16,color:colors.creamText,letterSpacing:1},
+  apptDate:{fontFamily:fonts.sansLight,fontSize:14,color:colors.gold,marginTop:4,letterSpacing:2},
+  apptNotes:{fontFamily:fonts.sansLight,fontSize:14,color:"rgba(245,239,228,0.6)",marginTop:6,lineHeight:20},
   mapBtn:{marginTop:20,backgroundColor:colors.gold,borderRadius:6,paddingVertical:12,alignItems:"center"},
   mapBtnT:{fontFamily:fonts.sansMedium,fontSize:16,color:colors.ink,letterSpacing:4,textTransform:"uppercase"},
   closeBtn:{marginTop:12,borderWidth:1,borderColor:colors.gold,borderRadius:6,paddingVertical:12,alignItems:"center"},
