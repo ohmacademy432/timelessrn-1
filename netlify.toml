@@ -1,5 +1,5 @@
 [build]
-  command = "npm run export:web"
+  command = "npm run export:web && node scripts/inject-og.js"
   publish = "dist"
 
 [[redirects]]
