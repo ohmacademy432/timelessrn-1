@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import DrawerMenu from "@/components/DrawerMenu";
@@ -27,7 +27,7 @@ export default function ServiceDetailScreen(){
         <Text style={s.secLbl}>OVERVIEW</Text><Text style={s.desc}>{service.description}</Text>
         <Text style={s.secLbl}>BENEFITS</Text>
         {service.benefits.map((b,i)=><View key={i} style={s.bRow}><Text style={s.bDot}>{"\u2022"}</Text><Text style={s.bT}>{b}</Text></View>)}
-        <TouchableOpacity style={s.bookBtn} onPress={()=>router.push("/booking")} activeOpacity={0.85}><Text style={s.bookBtnT}>BOOK NOW</Text></TouchableOpacity>
+        <TouchableOpacity style={s.bookBtn} onPress={()=>Linking.openURL("sms:16159702015")} activeOpacity={0.85}><Text style={s.bookBtnT}>BOOK NOW</Text></TouchableOpacity>
         <Text style={s.disc}>All treatments are administered by a Registered Nurse under MD oversight.</Text>
       </ScrollView>
       <BottomNav onMenuPress={()=>setMenuOpen(true)}/><DrawerMenu isOpen={menuOpen} onClose={()=>setMenuOpen(false)}/>

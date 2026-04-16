@@ -44,7 +44,7 @@ export default function DrawerMenu({ isOpen, onClose }: Props) {
           <Text style={s.brandT}>TIMELESS RN</Text><Text style={s.brandS}>Wellness Spa</Text><View style={s.brandDiv}/>
 
           <Text style={s.secLbl}>NAVIGATION</Text>
-          <MI l="Home" o={()=>go("/home")}/><MI l="Services" o={()=>go("/services")}/><MI l="Membership" o={()=>go("/membership")}/><MI l="Book Now" o={()=>go("/booking")}/><MI l="IV Therapy Pre-Screening" o={()=>{onClose();Linking.openURL("https://forms.gle/WzaPRFrgqk9rHTro7").catch(()=>{});}}/><MI l="NAD Pre-Screening" o={()=>{onClose();Linking.openURL("https://forms.gle/Wrdnz5DnvCSnBinQ6").catch(()=>{});}}/><MI l="Send Us a Message" o={()=>{onClose();Linking.openURL("sms:6159702015").catch(()=>{});}}/>
+          <MI l="Home" o={()=>go("/home")}/><MI l="Services" o={()=>go("/services")}/><MI l="Membership" o={()=>go("/membership")}/><MI l="Book Now" o={()=>{onClose();Linking.openURL("sms:16159702015").catch(()=>{});}}/><MI l="IV Therapy Pre-Screening" o={()=>{onClose();Linking.openURL("https://forms.gle/WzaPRFrgqk9rHTro7").catch(()=>{});}}/><MI l="NAD Pre-Screening" o={()=>{onClose();Linking.openURL("https://forms.gle/Wrdnz5DnvCSnBinQ6").catch(()=>{});}}/><MI l="Send Us a Message" o={()=>{onClose();Linking.openURL("sms:16159702015").catch(()=>{});}}/>
 
           <Text style={s.secLbl}>ACCOUNT</Text>
           <MI l="My Profile" o={()=>go("/profile")}/><MI l="Notifications" o={()=>go("/profile")}/><MI l="Appointment History" o={()=>modal("history")}/>
