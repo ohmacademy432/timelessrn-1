@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Switch, Alert, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Switch, Alert, KeyboardAvoidingView, Platform, Modal } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import DrawerMenu from "@/components/DrawerMenu";
@@ -7,6 +7,8 @@ import BottomNav from "@/components/BottomNav";
 import { colors, fonts } from "@/lib/theme";
 import { supabase } from "@/lib/supabase";
 import { enableNotifications, disableNotifications } from "@/lib/notifications";
+
+function showAlert(title:string,msg:string){if(Platform.OS==="web"){window.alert(`${title}\n\n${msg}`);}else{Alert.alert(title,msg);}}
 
 export default function ProfileScreen(){
   const router=useRouter();const[menuOpen,setMenuOpen]=useState(false);
@@ -28,9 +30,9 @@ export default function ProfileScreen(){
   };
   const save=async()=>{if(!userId)return;setSaving(true);try{
     const{error}=await supabase.from("profiles").upsert({id:userId,full_name:`${firstName} ${lastName}`.trim(),phone,date_of_birth:dob,health_goals:healthGoals,notifications_enabled:notifEnabled,notification_time:notifTime});
-    if(error)Alert.alert("Save failed",error.message);else Alert.alert("Saved","Your profile has been updated.");
-  }catch(e:any){Alert.alert("Save failed",e.message||"Unknown error.");}setSaving(false);};
-  const toggleNotif=async(v:boolean)=>{if(!userId)return;if(v){const ok=await enableNotifications(userId,notifTime);setNotifEnabled(ok);if(!ok)Alert.alert("Notifications not enabled","Please allow notifications in your device settings.");}else{await disableNotifications(userId);setNotifEnabled(false);}};
+    if(error)showAlert("Save failed",error.message);else showAlert("Saved","Your profile has been updated.");
+  }catch(e:any){showAlert("Save failed",e.message||"Unknown error.");}setSaving(false);};
+  const toggleNotif=async(v:boolean)=>{if(!userId)return;if(v){const ok=await enableNotifications(userId,notifTime);setNotifEnabled(ok);if(!ok)showAlert("Notifications","Please allow notifications in your browser settings.");}else{await disableNotifications(userId);setNotifEnabled(false);}};
 
   if(loading)return<View style={s.loadWrap}><StatusBar style="light"/><ActivityIndicator size="large" color={colors.gold}/></View>;
   return(
