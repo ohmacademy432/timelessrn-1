@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(npx expo-doctor:*)",
+      "Bash(timeout 90 npx expo export --platform web --clear)",
+      "Bash(npx expo:*)",
+      "Bash(npx netlify:*)"
+    ]
+  }
+}
