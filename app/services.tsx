@@ -36,7 +36,7 @@ export default function ServicesScreen() {
                     <Text style={s.cardNum}>{num}</Text>
                     <View style={s.cardNameRow}><Text style={s.cardName}>{svc.name}</Text>{svc.price?<Text style={s.cardPrice}>{svc.price}</Text>:null}</View>
                     <Text style={s.cardDesc}>{svc.description}</Text>
-                    <TouchableOpacity style={s.cardBtn} onPress={() => router.push("/booking")} activeOpacity={0.85}><Text style={s.cardBtnT}>BOOK NOW</Text></TouchableOpacity>
+                    <TouchableOpacity style={s.cardBtn} onPress={() => router.push("/chat")} activeOpacity={0.85}><Text style={s.cardBtnT}>ASK TIMELESS RN</Text></TouchableOpacity>
                   </TouchableOpacity>);
               })}
             </View>);

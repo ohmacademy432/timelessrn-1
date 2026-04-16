@@ -44,7 +44,7 @@ export default function WelcomeScreen() {
         <TouchableOpacity style={s.bookBtn} onPress={() => router.push("/login")} activeOpacity={0.85}>
           <Text style={s.bookBtnT}>SIGN IN</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/booking")}><Text style={s.signIn}>BOOK NOW</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/chat")}><Text style={s.signIn}>ASK TIMELESS RN</Text></TouchableOpacity>
       </View>
     </View>
   );

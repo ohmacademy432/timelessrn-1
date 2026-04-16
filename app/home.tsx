@@ -158,8 +158,8 @@ export default function HomeScreen() {
         </View>
 
         {/* ── GOLD BOOKING BAND ── */}
-        <TouchableOpacity style={st.band} onPress={() => router.push("/booking")} activeOpacity={0.85}>
-          <Text style={st.bandT}>Reserve Your Treatment</Text>
+        <TouchableOpacity style={st.band} onPress={() => router.push("/chat")} activeOpacity={0.85}>
+          <Text style={st.bandT}>Ask Timeless RN</Text>
           <Text style={st.bandA}>{"\u2192"}</Text>
         </TouchableOpacity>
 
@@ -186,13 +186,13 @@ export default function HomeScreen() {
         <View style={st.svcWrap}>
           <Text style={st.secLbl}>FEATURED TREATMENTS</Text>
           {SERVICES.map((svc) => (
-            <TouchableOpacity key={svc.num} style={st.svcCard} onPress={() => router.push("/booking")} activeOpacity={0.9}>
+            <TouchableOpacity key={svc.num} style={st.svcCard} onPress={() => router.push("/chat")} activeOpacity={0.9}>
               <Text style={st.svcNum}>{svc.num}</Text>
               <Text style={st.svcName}>{svc.name}</Text>
               <Text style={st.svcDesc}>{svc.desc}</Text>
               <View style={st.svcFoot}>
                 <Text style={st.svcPrice}>{svc.price}</Text>
-                <Text style={st.svcLearn}>BOOK NOW {"\u2192"}</Text>
+                <Text style={st.svcLearn}>ASK TIMELESS RN {"\u2192"}</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -257,8 +257,8 @@ export default function HomeScreen() {
                 {!open && <Text style={st.resPrev}>{r.preview}</Text>}
                 {open && <View>
                   <Text style={st.resCont}>{r.content}</Text>
-                  <TouchableOpacity style={st.resBookBtn} onPress={() => router.push("/booking")} activeOpacity={0.85}>
-                    <Text style={st.resBookT}>BOOK NOW</Text>
+                  <TouchableOpacity style={st.resBookBtn} onPress={() => router.push("/chat")} activeOpacity={0.85}>
+                    <Text style={st.resBookT}>ASK TIMELESS RN</Text>
                   </TouchableOpacity>
                 </View>}
               </TouchableOpacity>

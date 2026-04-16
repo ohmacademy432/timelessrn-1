@@ -27,7 +27,7 @@ export default function ServiceDetailScreen(){
         <Text style={s.secLbl}>OVERVIEW</Text><Text style={s.desc}>{service.description}</Text>
         <Text style={s.secLbl}>BENEFITS</Text>
         {service.benefits.map((b,i)=><View key={i} style={s.bRow}><Text style={s.bDot}>{"\u2022"}</Text><Text style={s.bT}>{b}</Text></View>)}
-        <TouchableOpacity style={s.bookBtn} onPress={()=>router.push("/booking")} activeOpacity={0.85}><Text style={s.bookBtnT}>BOOK NOW</Text></TouchableOpacity>
+        <TouchableOpacity style={s.bookBtn} onPress={()=>router.push("/chat")} activeOpacity={0.85}><Text style={s.bookBtnT}>ASK TIMELESS RN</Text></TouchableOpacity>
         <Text style={s.disc}>All treatments are administered by a Registered Nurse under MD oversight.</Text>
       </ScrollView>
       <BottomNav onMenuPress={()=>setMenuOpen(true)}/><DrawerMenu isOpen={menuOpen} onClose={()=>setMenuOpen(false)}/>
