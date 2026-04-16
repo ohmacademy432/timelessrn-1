@@ -47,7 +47,7 @@ export default function BookingScreen(){
         <Text style={s.confirmB}>Thank you{name?`, ${name.split(" ")[0]}`:""}.{"\n"}Your request has been prepared in your email app. Once sent we will confirm your booking as soon as possible.</Text>
         <View style={s.confirmCard}>
           <Text style={s.confirmCardT}>TIMELESS RN WELLNESS SPA</Text>
-          <Text style={s.confirmCardB}>West Nashville \u2014 The Nations{"\n"}Nashville, TN{"\n\n"}Tuesday - Saturday: 11am - 7pm{"\n"}Sunday: By Request{"\n"}Monday: Closed{"\n\n"}615-970-2015{"\n"}timelessrnwellnessspa@gmail.com</Text>
+          <Text style={s.confirmCardB}>4909 Alabama Ave{"\n"}Nashville, TN 37029{"\n"}West Nashville \u2014 The Nations{"\n\n"}Tuesday - Saturday: 11am - 7pm{"\n"}Sunday: By Request{"\n"}Monday: Closed{"\n\n"}615-970-2015{"\n"}timelessrnwellnessspa@gmail.com</Text>
         </View>
         <TouchableOpacity style={s.homeBtn} onPress={()=>router.replace("/home")}><Text style={s.homeBtnT}>RETURN HOME</Text></TouchableOpacity>
       </ScrollView>

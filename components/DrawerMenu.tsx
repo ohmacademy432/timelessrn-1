@@ -10,8 +10,8 @@ type ModalKey = null|"about"|"team"|"location"|"contact"|"history"|"privacy"|"te
 const MODALS: Record<string,{title:string;body:string}> = {
   about:{title:"ABOUT TIMELESS RN",body:"Timeless RN Wellness Spa was established in 2017 and is located in West Nashville, The Nations. We specialize in evidence-based, nurse-administered IV therapies and wellness solutions. All treatments are administered by Registered Nurses under the guidance of Medical Director Dr. Lawrence Jackson Jr.\n\nOur mission is to provide safe, effective, and convenient therapies that support your energy, immunity, recovery, and longevity."},
   team:{title:"OUR TEAM",body:"Our team is led by Registered Nurses with clinical experience in hydration, aesthetics, and regenerative therapies.\n\nMedical Director: Dr. Lawrence Jackson Jr. \u2014 provides oversight for all protocols and treatments.\n\nEvery session at Timeless RN is personally administered by a licensed RN, ensuring the highest level of safety and care."},
-  location:{title:"LOCATION & HOURS",body:"West Nashville \u2014 The Nations\nNashville, TN\n\nTuesday - Saturday: 11am - 7pm\nSunday: By Request\nMonday: Closed\n\n615-970-2015\ntimelessrnwellnessspa@gmail.com"},
-  contact:{title:"CONTACT US",body:"We\u2019d love to hear from you.\n\nPhone: 615-970-2015\nEmail: timelessrnwellnessspa@gmail.com\n\nWest Nashville \u2014 The Nations\nNashville, TN"},
+  location:{title:"LOCATION & HOURS",body:"4909 Alabama Ave\nNashville, TN 37029\nWest Nashville \u2014 The Nations\n\nTuesday - Saturday: 11am - 7pm\nSunday: By Request\nMonday: Closed\n\n615-970-2015\ntimelessrnwellnessspa@gmail.com"},
+  contact:{title:"CONTACT US",body:"We\u2019d love to hear from you.\n\nPhone: 615-970-2015\nEmail: timelessrnwellnessspa@gmail.com\n\n4909 Alabama Ave\nNashville, TN 37029\nWest Nashville \u2014 The Nations"},
   history:{title:"APPOINTMENT HISTORY",body:"Your appointment history will appear here once you\u2019ve completed your first visit.\n\nBook your first session to begin your wellness journey with Timeless RN."},
   privacy:{title:"PRIVACY POLICY",body:"Timeless RN takes your privacy seriously. Your personal and health information is stored securely and never sold or shared with third parties.\n\nAll treatment records are maintained in accordance with HIPAA standards.\n\nFor questions about your data please contact us at timelessrnwellnessspa@gmail.com."},
   terms:{title:"TERMS OF USE",body:"By using the Timeless RN app you agree to use this service for your personal wellness. All treatments are subject to nurse screening and medical director approval.\n\nTimeless RN is not a substitute for emergency medical care. If you are experiencing a medical emergency please call 911.\n\nYour continued use of the app constitutes acceptance of these terms."},
@@ -44,7 +44,7 @@ export default function DrawerMenu({ isOpen, onClose }: Props) {
           <Text style={s.brandT}>TIMELESS RN</Text><Text style={s.brandS}>Wellness Spa</Text><View style={s.brandDiv}/>
 
           <Text style={s.secLbl}>NAVIGATION</Text>
-          <MI l="Home" o={()=>go("/home")}/><MI l="Services" o={()=>go("/services")}/><MI l="Membership" o={()=>go("/membership")}/><MI l="Book Now" o={()=>{onClose();Linking.openURL("sms:16159702015").catch(()=>{});}}/><MI l="IV Therapy Pre-Screening" o={()=>{onClose();Linking.openURL("https://forms.gle/WzaPRFrgqk9rHTro7").catch(()=>{});}}/><MI l="NAD Pre-Screening" o={()=>{onClose();Linking.openURL("https://forms.gle/Wrdnz5DnvCSnBinQ6").catch(()=>{});}}/><MI l="Send Us a Message" o={()=>{onClose();Linking.openURL("sms:16159702015").catch(()=>{});}}/>
+          <MI l="Home" o={()=>go("/home")}/><MI l="Services" o={()=>go("/services")}/><MI l="Membership" o={()=>go("/membership")}/><MI l="Book Now" o={()=>go("/booking")}/><MI l="IV Therapy Pre-Screening" o={()=>{onClose();Linking.openURL("https://forms.gle/WzaPRFrgqk9rHTro7").catch(()=>{});}}/><MI l="NAD Pre-Screening" o={()=>{onClose();Linking.openURL("https://forms.gle/Wrdnz5DnvCSnBinQ6").catch(()=>{});}}/><MI l="Send Us a Message" o={()=>{onClose();Linking.openURL("sms:16159702015").catch(()=>{});}}/>
 
           <Text style={s.secLbl}>ACCOUNT</Text>
           <MI l="My Profile" o={()=>go("/profile")}/><MI l="Notifications" o={()=>go("/profile")}/><MI l="Appointment History" o={()=>modal("history")}/>
@@ -59,17 +59,18 @@ export default function DrawerMenu({ isOpen, onClose }: Props) {
         </ScrollView>
       </Animated.View>
     </View>}
-    {(Object.keys(MODALS) as (keyof typeof MODALS)[]).map(k=><InfoModal key={k} visible={activeModal===k} title={MODALS[k].title} body={MODALS[k].body} onClose={()=>setActiveModal(null)}/>)}
+    {(Object.keys(MODALS) as (keyof typeof MODALS)[]).map(k=><InfoModal key={k} visible={activeModal===k} title={MODALS[k].title} body={MODALS[k].body} onClose={()=>setActiveModal(null)} showMapBtn={k==="location"}/>)}
   </>);
 }
 
 function MI({l,o}:{l:string;o:()=>void}){return<TouchableOpacity style={s.mi} onPress={o} activeOpacity={0.7}><Text style={s.miT}>{l}</Text></TouchableOpacity>;}
 
-function InfoModal({visible,title,body,onClose}:{visible:boolean;title:string;body:string;onClose:()=>void}){
+function InfoModal({visible,title,body,onClose,showMapBtn}:{visible:boolean;title:string;body:string;onClose:()=>void;showMapBtn?:boolean}){
   if(!visible)return null;
   return(<View style={m.root}><TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose}/>
     <View style={m.card}><Text style={m.title}>{title}</Text><View style={m.div}/>
       <ScrollView style={m.bs} showsVerticalScrollIndicator={false}><Text style={m.body}>{body}</Text></ScrollView>
+      {showMapBtn&&<TouchableOpacity onPress={()=>Linking.openURL("https://www.google.com/maps/search/?api=1&query=4909+Alabama+Ave+Nashville+TN+37029")} style={m.mapBtn} activeOpacity={0.85}><Text style={m.mapBtnT}>OPEN IN MAPS</Text></TouchableOpacity>}
       <TouchableOpacity onPress={onClose} style={m.closeBtn}><Text style={m.closeBtnT}>CLOSE</Text></TouchableOpacity>
     </View></View>);
 }
@@ -94,6 +95,8 @@ const m=StyleSheet.create({
   title:{fontFamily:fonts.sans,fontSize:18,color:colors.gold,letterSpacing:4,textAlign:"center",textTransform:"uppercase"},
   div:{height:1,backgroundColor:"rgba(184,137,90,0.2)",marginTop:14,marginBottom:16},
   bs:{maxHeight:360},body:{fontFamily:fonts.sansLight,fontSize:25,lineHeight:39,color:"rgba(245,239,228,0.8)"},
-  closeBtn:{marginTop:20,borderWidth:1,borderColor:colors.gold,borderRadius:6,paddingVertical:12,alignItems:"center"},
+  mapBtn:{marginTop:20,backgroundColor:colors.gold,borderRadius:6,paddingVertical:12,alignItems:"center"},
+  mapBtnT:{fontFamily:fonts.sansMedium,fontSize:16,color:colors.ink,letterSpacing:4,textTransform:"uppercase"},
+  closeBtn:{marginTop:12,borderWidth:1,borderColor:colors.gold,borderRadius:6,paddingVertical:12,alignItems:"center"},
   closeBtnT:{fontFamily:fonts.sansMedium,fontSize:16,color:colors.gold,letterSpacing:4,textTransform:"uppercase"},
 });

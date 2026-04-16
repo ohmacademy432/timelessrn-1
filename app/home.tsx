@@ -186,7 +186,7 @@ export default function HomeScreen() {
         <View style={st.svcWrap}>
           <Text style={st.secLbl}>FEATURED TREATMENTS</Text>
           {SERVICES.map((svc) => (
-            <TouchableOpacity key={svc.num} style={st.svcCard} onPress={() => Linking.openURL("sms:16159702015")} activeOpacity={0.9}>
+            <TouchableOpacity key={svc.num} style={st.svcCard} onPress={() => router.push("/booking")} activeOpacity={0.9}>
               <Text style={st.svcNum}>{svc.num}</Text>
               <Text style={st.svcName}>{svc.name}</Text>
               <Text style={st.svcDesc}>{svc.desc}</Text>
@@ -257,7 +257,7 @@ export default function HomeScreen() {
                 {!open && <Text style={st.resPrev}>{r.preview}</Text>}
                 {open && <View>
                   <Text style={st.resCont}>{r.content}</Text>
-                  <TouchableOpacity style={st.resBookBtn} onPress={() => Linking.openURL("sms:16159702015")} activeOpacity={0.85}>
+                  <TouchableOpacity style={st.resBookBtn} onPress={() => router.push("/booking")} activeOpacity={0.85}>
                     <Text style={st.resBookT}>BOOK NOW</Text>
                   </TouchableOpacity>
                 </View>}
