@@ -13,8 +13,8 @@ export default function BottomNav({ active = null, onMenuPress }: Props) {
         <Text style={[s.lbl, active === "home" && s.lblActive]}>HOME</Text>
       </TouchableOpacity>
       <View style={s.centerWrap}>
-        <TouchableOpacity onPress={() => router.push("/booking")} activeOpacity={0.85} style={s.centerBtn}>
-          <Text style={s.centerT}>BOOK{"\n"}NOW</Text>
+        <TouchableOpacity onPress={() => router.push("/chat")} activeOpacity={0.85} style={s.centerBtn}>
+          <Text style={s.centerT}>TIMELESS{"\n"}RN</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={s.item} onPress={onMenuPress} activeOpacity={0.7}>
