@@ -57,7 +57,7 @@ export default function DrawerMenu({ isOpen, onClose }: Props) {
           <Text style={s.secLbl}>ACCOUNT</Text>
           <MI l="My Profile" o={()=>go("/profile")}/><MI l="Notifications" o={()=>go("/profile")}/><MI l="Appointment History" o={()=>modal("history")}/>
 
-          {isAdmin && <><Text style={s.secLbl}>ADMIN</Text><MI l="Manage Appointments" o={()=>go("/admin")}/></>}
+          {isAdmin && <><Text style={s.secLbl}>ADMIN</Text><MI l="Manage Appointments" o={()=>go("/admin")}/><MI l="Contacts" o={()=>go("/contacts")}/></>}
 
           <Text style={s.secLbl}>INFO</Text>
           <MI l="About Timeless RN" o={()=>modal("about")}/><MI l="Our Team" o={()=>modal("team")}/><MI l="Location & Hours" o={()=>modal("location")}/><MI l="Contact Us" o={()=>modal("contact")}/>
