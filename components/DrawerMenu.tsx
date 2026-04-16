@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Linking, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Linking, ActivityIndicator, TextInput, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { colors, fonts } from "@/lib/theme";
@@ -76,37 +76,77 @@ export default function DrawerMenu({ isOpen, onClose }: Props) {
 
 function MI({l,o}:{l:string;o:()=>void}){return<TouchableOpacity style={s.mi} onPress={o} activeOpacity={0.7}><Text style={s.miT}>{l}</Text></TouchableOpacity>;}
 
+const PATIENT_SERVICES = [
+  "IV Hydration Therapy","NAD+ Infusions","Glutathione Therapy","Vitamin C Infusions",
+  "Custom IV Blend","PRP Facial","PRP Hair Growth","PRP Joint Injection",
+  "RF Microneedling with PRP","Wellness Add-Ons",
+];
+
+function showAlert(t:string,msg:string){if(Platform.OS==="web")window.alert(`${t}\n\n${msg}`);else{const{Alert}=require("react-native");Alert.alert(t,msg);}}
+
 function HistoryModal({visible,onClose}:{visible:boolean;onClose:()=>void}){
   const[loading,setLoading]=useState(false);
   const[appointments,setAppointments]=useState<Appointment[]>([]);
+  const[showForm,setShowForm]=useState(false);
+  const[service,setService]=useState("");
+  const[date,setDate]=useState("");
+  const[notes,setNotes]=useState("");
+  const[saving,setSaving]=useState(false);
 
-  useEffect(()=>{
-    if(!visible)return;
+  const load=async()=>{
     setLoading(true);
-    (async()=>{
-      const{data:{user}}=await supabase.auth.getUser();
-      if(!user){setLoading(false);return;}
-      const{data}=await supabase.from("appointments").select("id, service, appointment_date, notes").eq("profile_id",user.id).order("appointment_date",{ascending:false});
-      setAppointments(data||[]);
-      setLoading(false);
-    })();
-  },[visible]);
+    const{data:{user}}=await supabase.auth.getUser();
+    if(!user){setLoading(false);return;}
+    const{data}=await supabase.from("appointments").select("id, service, appointment_date, notes").eq("profile_id",user.id).order("appointment_date",{ascending:false});
+    setAppointments(data||[]);
+    setLoading(false);
+  };
+
+  useEffect(()=>{if(visible){load();setShowForm(false);setService("");setDate("");setNotes("");}},[visible]);
+
+  const save=async()=>{
+    if(!service||!date){showAlert("Missing info","Please select a service and enter the date.");return;}
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){showAlert("Invalid date","Use YYYY-MM-DD format (e.g. 2026-04-16).");return;}
+    setSaving(true);
+    const{data:{user}}=await supabase.auth.getUser();
+    if(!user){setSaving(false);return;}
+    const{error}=await supabase.from("appointments").insert({profile_id:user.id,service,appointment_date:date,notes:notes.trim()});
+    if(error){showAlert("Error",error.message);}
+    else{showAlert("Saved","Visit logged successfully.");setShowForm(false);setService("");setDate("");setNotes("");load();}
+    setSaving(false);
+  };
 
   if(!visible)return null;
   return(<View style={m.root}><TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose}/>
     <View style={m.card}><Text style={m.title}>APPOINTMENT HISTORY</Text><View style={m.div}/>
       <ScrollView style={m.bs} showsVerticalScrollIndicator={false}>
         {loading&&<ActivityIndicator color={colors.gold} style={{marginTop:16}}/>}
-        {!loading&&appointments.length===0&&<Text style={m.body}>No visits recorded yet.{"\n\n"}Your appointment history will appear here after your first visit with Timeless RN.</Text>}
-        {!loading&&appointments.map(a=>(
+        {!loading&&!showForm&&appointments.length===0&&<Text style={m.body}>No visits recorded yet.{"\n\n"}Tap below to log your first visit.</Text>}
+        {!loading&&!showForm&&appointments.map(a=>(
           <View key={a.id} style={m.apptCard}>
             <Text style={m.apptService}>{a.service}</Text>
             <Text style={m.apptDate}>{a.appointment_date}</Text>
             {a.notes?<Text style={m.apptNotes}>{a.notes}</Text>:null}
           </View>
         ))}
+        {!loading&&showForm&&<>
+          <Text style={m.formLbl}>SERVICE</Text>
+          <View style={m.svcGrid}>{PATIENT_SERVICES.map(sv=>(
+            <TouchableOpacity key={sv} style={[m.svcChip,service===sv&&m.svcChipA]} onPress={()=>setService(sv)} activeOpacity={0.8}>
+              <Text style={[m.svcChipT,service===sv&&m.svcChipTA]}>{sv}</Text>
+            </TouchableOpacity>
+          ))}</View>
+          <Text style={m.formLbl}>DATE (YYYY-MM-DD)</Text>
+          <TextInput style={m.formInp} value={date} onChangeText={setDate} placeholder="2026-04-16" placeholderTextColor={colors.textMuted}/>
+          <Text style={m.formLbl}>NOTES (OPTIONAL)</Text>
+          <TextInput style={[m.formInp,{minHeight:60}]} value={notes} onChangeText={setNotes} placeholder="Any notes..." placeholderTextColor={colors.textMuted} multiline/>
+          <TouchableOpacity style={[m.mapBtn,saving&&{opacity:0.6}]} onPress={save} disabled={saving} activeOpacity={0.85}>
+            {saving?<ActivityIndicator color={colors.ink}/>:<Text style={m.mapBtnT}>SAVE VISIT</Text>}
+          </TouchableOpacity>
+        </>}
       </ScrollView>
-      <TouchableOpacity onPress={onClose} style={m.closeBtn}><Text style={m.closeBtnT}>CLOSE</Text></TouchableOpacity>
+      {!showForm&&<TouchableOpacity onPress={()=>setShowForm(true)} style={m.mapBtn} activeOpacity={0.85}><Text style={m.mapBtnT}>LOG A VISIT</Text></TouchableOpacity>}
+      <TouchableOpacity onPress={()=>{if(showForm){setShowForm(false);}else{onClose();}}} style={m.closeBtn}><Text style={m.closeBtnT}>{showForm?"BACK":"CLOSE"}</Text></TouchableOpacity>
     </View></View>);
 }
 
@@ -144,6 +184,13 @@ const m=StyleSheet.create({
   apptService:{fontFamily:fonts.sansMedium,fontSize:16,color:colors.creamText,letterSpacing:1},
   apptDate:{fontFamily:fonts.sansLight,fontSize:14,color:colors.gold,marginTop:4,letterSpacing:2},
   apptNotes:{fontFamily:fonts.sansLight,fontSize:14,color:"rgba(245,239,228,0.6)",marginTop:6,lineHeight:20},
+  formLbl:{fontFamily:fonts.sans,fontSize:12,letterSpacing:3,color:colors.gold,textTransform:"uppercase",marginBottom:8,marginTop:14},
+  svcGrid:{flexDirection:"row",flexWrap:"wrap",gap:6},
+  svcChip:{borderWidth:1,borderColor:"rgba(184,137,90,0.3)",borderRadius:6,paddingVertical:8,paddingHorizontal:12},
+  svcChipA:{backgroundColor:colors.gold,borderColor:colors.gold},
+  svcChipT:{fontFamily:fonts.sansLight,fontSize:13,color:colors.creamText},
+  svcChipTA:{color:colors.ink},
+  formInp:{fontFamily:fonts.sansLight,fontSize:16,color:colors.creamText,borderBottomWidth:1,borderBottomColor:"rgba(184,137,90,0.3)",paddingVertical:8,marginBottom:4,lineHeight:22},
   mapBtn:{marginTop:20,backgroundColor:colors.gold,borderRadius:6,paddingVertical:12,alignItems:"center"},
   mapBtnT:{fontFamily:fonts.sansMedium,fontSize:16,color:colors.ink,letterSpacing:4,textTransform:"uppercase"},
   closeBtn:{marginTop:12,borderWidth:1,borderColor:colors.gold,borderRadius:6,paddingVertical:12,alignItems:"center"},
